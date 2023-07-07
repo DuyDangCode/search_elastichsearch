@@ -11,8 +11,17 @@ const example = [
   { id: 10, title: "Pete Smalls Is Dead" },
 ];
 
-function getData() {
+//dữ liệu trả về là một array với id và title là bắt buộc
+
+function suggestData() {
+  // dữ liệu khi gõ
   return example;
 }
 
-export default getData();
+function getData() {
+  // dữ liệu khi nhấn nút tìm kiếm
+  return example;
+}
+
+exports.suggestData = suggestData();
+exports.getData = getData();
