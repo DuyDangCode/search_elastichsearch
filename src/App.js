@@ -1,87 +1,82 @@
+import axios from "axios";
 import "./App.css";
-import { suggestData, getData } from "./getData";
-import { useState } from "react";
-
-let suggest = suggestData;
+import { useEffect, useState } from "react";
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [btn, setBtn] = useState(false);
+  const [query, setQuery] = useState("")
+  const [products, setProducts] = useState([])
+  const [suggestions, setSuggestions] = useState([])
+
+  const getProducts = async () => {
+    setSuggestions([])
+    const res = await axios.get('http://localhost:8081/api/products', {
+      params: {
+        query
+      }
+    })
+    console.log(res.data)
+    setProducts(res.data)
+  }
+
+  const getSuggestions = async () => {
+    const res = await axios.get('http://localhost:8081/api/products/suggestions', {
+      params: {
+        query
+      }
+    })
+    console.log(res.data)
+    setSuggestions(res.data)
+  }
+
+  useEffect(() => {
+    getSuggestions()
+  }, [query])
 
   return (
-    <div class="container" style={{ width: "max-content" }}>
-      <div class="container" style={{ width: "100%" }}>
+    <div className="container" style={{ width: "max-content" }}>
+      <div className="container" style={{ width: "100%" }}>
         <div style={{ flexDirection: "row" }}>
           <input
             placeholder="search with Elasticsearch"
-            class="search"
+            className="search"
             value={query}
-            onChange={(event) => {
-              //call search function
-              setQuery(event.target.value);
-              setBtn(false);
-              suggest = suggestData;
-            }}
+            onChange={(e) => setQuery(e.target.value)}
           />
           <button
-            class="btn"
-            onClick={() => {
-              setBtn(true);
-              suggest = null;
-            }}
+            className="btn"
+            onClick={() => getProducts()}
           >
             Enter
           </button>
         </div>
 
-        {btn
-          ? getData
-              .filter((movie) => {
-                if (
-                  query !== "" &&
-                  movie.title.toLowerCase().includes(query.toLowerCase())
-                ) {
-                  return movie;
-                }
-              })
-              .map((movie, index) => {
-                return (
-                  <div key={index} class="box">
-                    <p>{movie.title}</p>
-                  </div>
-                );
-              })
-          : null}
+        {
+          products && products.length > 0 &&
+          products.map(product => {
+            return (
+              <div key={product.id} class="box">
+                  <p style={{fontWeight: 'bold'}}>{product.name}</p>
+                  <p style={{fontStyle: 'oblique'}}>{product.description}</p>
+                </div>
+            )
+          })
+        }
       </div>
 
-      <div style={{ width: "100%" }}>
-        {console.log(1)}
-        {suggest != null
-          ? suggest
-              .filter((movie) => {
-                if (
-                  query !== "" &&
-                  movie.title.toLowerCase().includes(query.toLowerCase())
-                ) {
-                  return movie;
-                }
-              })
-              .map((movie, index) => {
-                return (
-                  <div
-                    key={index}
-                    class="propose"
-                    onClick={() => {
-                      setQuery(movie.title);
-                      setBtn(true);
-                      suggest = null;
-                    }}
-                  >
-                    <p>{movie.title}</p>
-                  </div>
-                );
-              })
-          : null}
+      <div style={{ width: "100%", position: 'absolute', top: 95, zIndex: 999, cursor: 'pointer' }}>
+          {
+            suggestions && suggestions.length > 0 && suggestions.map((suggestion, index) => {
+              return (
+                <div
+                  key={index}
+                  className="propose"
+                  onClick={() => setQuery(suggestion)}
+                >
+                  <p>{suggestion}</p>
+                </div>
+              )
+            })
+          }
       </div>
     </div>
   );
