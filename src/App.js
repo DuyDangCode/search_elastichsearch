@@ -29,7 +29,8 @@ function App() {
   }
 
   useEffect(() => {
-    getSuggestions()
+    if (query.trim() != '')
+      getSuggestions()
   }, [query])
 
   return (
@@ -55,28 +56,28 @@ function App() {
           products.map(product => {
             return (
               <div key={product.id} class="box">
-                  <p style={{fontWeight: 'bold'}}>{product.name}</p>
-                  <p style={{fontStyle: 'oblique'}}>{product.description}</p>
-                </div>
+                <p style={{ fontWeight: 'bold' }}>{product.name}</p>
+                <p style={{ fontStyle: 'oblique' }}>{product.description}</p>
+              </div>
             )
           })
         }
       </div>
 
       <div style={{ width: "100%", position: 'absolute', top: 95, zIndex: 999, cursor: 'pointer' }}>
-          {
-            suggestions && suggestions.length > 0 && suggestions.map((suggestion, index) => {
-              return (
-                <div
-                  key={index}
-                  className="propose"
-                  onClick={() => setQuery(suggestion)}
-                >
-                  <p>{suggestion}</p>
-                </div>
-              )
-            })
-          }
+        {
+          suggestions && suggestions.length > 0 && suggestions.map((suggestion, index) => {
+            return (
+              <div
+                key={index}
+                className="propose"
+                onClick={() => setQuery(suggestion)}
+              >
+                <p>{suggestion}</p>
+              </div>
+            )
+          })
+        }
       </div>
     </div>
   );
